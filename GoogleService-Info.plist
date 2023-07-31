@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>DesignCode needs access to your camera to take photos</string>
+	<key>CLIENT_ID</key>
+	<string>940516954205-rh06r6ls08ujnc5p6o0sjb8isk8moolv.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.940516954205-rh06r6ls08ujnc5p6o0sjb8isk8moolv</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBn_tE8O1mIqA0U6dW3waeDs6tqXZGybuA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>940516954205</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.manraj21.Kaio</string>
+	<key>PROJECT_ID</key>
+	<string>kaioflex-64eba</string>
+	<key>STORAGE_BUCKET</key>
+	<string>kaioflex-64eba.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:940516954205:ios:20dbb9155c8b8ad1d0fdb4</string>
+	<key>DATABASE_URL</key>
+	<string>https://kaioflex-64eba-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
