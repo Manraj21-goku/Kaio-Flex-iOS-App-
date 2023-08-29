@@ -4,12 +4,19 @@
 //
 //  Created by Manraj Singh on 17/07/23.
 //
-
+import Foundation
 import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+
+struct WorkoutSession: Codable,Hashable {
+    var workoutName: String
+    var elapsedTime: String
+    var date: String
+    
+}
 
 struct WorkoutHistory: Codable {
     var date: Date
@@ -21,6 +28,9 @@ struct HomeView: View {
     @State private var selectedTabs: Tabs = .Home
     @State private var searchText = ""
     @State private var workoutHistory: [WorkoutSession] = []
+    var sortedWorkoutHistory: [WorkoutSession] {
+           return workoutHistory.sorted(by: { $0.date > $1.date })
+       }
     
     
     var body: some View {
@@ -34,19 +44,19 @@ struct HomeView: View {
                     }
                     else{
                         List {
-                            ForEach(workoutHistory.filter { workout in
+                            ForEach(sortedWorkoutHistory.filter { workout in
                                 searchText.isEmpty || workout.date.localizedStandardContains(searchText)
                             }, id: \.self) { workout in
                                 HStack {
                                     VStack{
                                         Image(systemName: "calendar.circle.fill")
-                                            .foregroundColor(.white)
+                                            //.foregroundColor(.black)
                                             .font(.system(size: 20))
                                         Spacer().frame(height: 10)
                                         Image(systemName: "dumbbell")
                                             .foregroundColor(.red)
                                             .font(.system(size: 20))
-                                      //  Image(systemName: "clock")
+                                        //  Image(systemName: "clock")
                                         //    .foregroundColor(.gray)
                                     }
                                     
@@ -62,28 +72,33 @@ struct HomeView: View {
                                     Image(systemName: "clock")
                                         .foregroundColor(.gray)
                                         .font(.system(size: 20))
-                                  /*  Spacer()
-                                    Image("back-bi")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 120)
-                                        .cornerRadius(10)
-                                        .padding(.vertical,5)
-                                       */
+                                    /*  Spacer()
+                                     Image("back-bi")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(height: 120)
+                                     .cornerRadius(10)
+                                     .padding(.vertical,5)
+                                     */
                                     
                                     
                                 }
-                                /* VStack(alignment: .leading) {
-                                 Text("\(workout.date)")
-                                 
-                                 Text("\(workout.workoutName)")
-                                 Text("Duration:\(workout.elapsedTime)")
-                                 
-                                 }*/
+                                .contextMenu{
+                                    Button {
+                                        deleteWorkout(workout)
+                                    } label: {
+                                        HStack{
+                                            Image(systemName: "trash")
+                                            Text("Delete!")
+                                                .foregroundColor(.red)
+                                        }
+                                    }
+
+                                }
                             }
                         }
                         .listStyle(InsetGroupedListStyle())
-                        .padding(.top)
+                       // .padding(.top)
                     }
                 }
                 
@@ -94,7 +109,7 @@ struct HomeView: View {
         .onAppear {
             fetchWorkoutHistory()
         }
-        .searchable(text: $searchText, prompt: "Search Day")
+        .searchable(text: $searchText, prompt: "Search Date")
     }
     func fetchWorkoutHistory() {
         guard let user = Auth.auth().currentUser else {
@@ -123,7 +138,39 @@ struct HomeView: View {
             }
         }
     }
-    
+    func deleteWorkout(_ workout: WorkoutSession) {
+        // Step 1: Delete locally
+        if let index = workoutHistory.firstIndex(of: workout) {
+            workoutHistory.remove(at: index)
+        }
+        
+        // Step 2: Delete from Firebase
+        guard let user = Auth.auth().currentUser else {
+            print("User not authenticated.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let sanitizedEmail = user.email?.replacingOccurrences(of: ".", with: "_").replacingOccurrences(of: "@", with: "_") ?? "unknown_email"
+        
+        db.collection("Session").document(sanitizedEmail).collection("Workouts")
+            .whereField("date", isEqualTo: workout.date)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching workout documents: \(error.localizedDescription)")
+                    return
+                }
+                
+                for document in snapshot?.documents ?? [] {
+                    db.collection("Session").document(sanitizedEmail).collection("Workouts").document(document.documentID).delete() { error in
+                        if let error = error {
+                            print("Error deleting workout document: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+    }
+
 }
 
 struct HomeView_Previews: PreviewProvider {
@@ -132,4 +179,3 @@ struct HomeView_Previews: PreviewProvider {
         
     }
 }
-
